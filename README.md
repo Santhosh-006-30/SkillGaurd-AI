@@ -11,6 +11,16 @@
 
 ---
 
+## 🌐 Live Vercel Deployment
+* **Live Web App**: [https://skill-gaurd-ai-sih.vercel.app](https://skill-gaurd-ai-sih.vercel.app) (also accessible at [https://skillguard-ai-demo.vercel.app](https://skillguard-ai-demo.vercel.app))
+* **Demo Sign-in Accounts**:
+  * **Super Admin**: `admin` / `AdminPassword@2026`
+  * **State Monitor**: `monitor` / `MonitorPassword@2026`
+  * **Field Inspector**: `inspector` / `InspectorPassword@2026`
+  * **Centre Operator**: `operator` / `OperatorPassword@2026`
+
+---
+
 ## 1. Project Overview
 SkillGuard AI is an automated compliance monitoring system designed to verify government-funded vocational and skill training centres. The system estimates physical occupancy, detects sanctioned laboratory infrastructure, observes equipment activity, and reconciles records against official quotas — all without facial recognition or biometric identification.
 
