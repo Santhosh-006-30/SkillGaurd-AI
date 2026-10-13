@@ -29,20 +29,45 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const res = await fetch('/api/v1/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        throw new Error(data.error?.message || 'Authentication failed');
+      let data: any = null;
+      try {
+        const res = await fetch('/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+        const text = await res.text();
+        data = text ? JSON.parse(text) : null;
+      } catch {
+        // Backend offline or running on static Vercel deployment
+        data = null;
       }
 
-      login(data.data.access_token, data.data.user);
-      navigate('/');
+      if (data && data.success && data.data) {
+        login(data.data.access_token, data.data.user);
+        navigate('/');
+        return;
+      }
+
+      // Check against verified demonstration accounts (for offline / Vercel cloud demo)
+      const demoAccount = demoAccounts.find(
+        (a) => a.username.toLowerCase() === username.trim().toLowerCase() && a.pwd === password
+      );
+
+      if (demoAccount) {
+        const mockUser = {
+          id: demoAccount.label === 'Admin' ? 1 : demoAccount.label === 'Monitor' ? 2 : demoAccount.label === 'Inspector' ? 3 : 4,
+          username: demoAccount.username,
+          email: `${demoAccount.username}@skillguard.gov.in`,
+          role: demoAccount.role as any,
+          is_active: true,
+        };
+        login(`demo_token_${demoAccount.role.toLowerCase()}`, mockUser);
+        navigate('/');
+        return;
+      }
+
+      throw new Error(data?.error?.message || 'Incorrect username or password');
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);

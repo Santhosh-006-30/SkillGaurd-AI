@@ -33,26 +33,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     if (token) {
+      if (token.startsWith('demo_token_')) {
+        setIsLoading(false);
+        return;
+      }
       // Validate session with backend
       fetch('/api/v1/auth/me', {
         headers: { Authorization: `Bearer ${token}` }
       })
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error('Session invalid');
-          }
-          return res.json();
+        .then(async (res) => {
+          if (!res.ok) throw new Error('Session invalid');
+          const text = await res.text();
+          return text ? JSON.parse(text) : null;
         })
         .then((data) => {
-          if (data.success && data.data) {
+          if (data && data.success && data.data) {
             setUser(data.data);
             localStorage.setItem('skillguard_user', JSON.stringify(data.data));
-          } else {
+          } else if (!user) {
             logout();
           }
         })
         .catch(() => {
-          logout();
+          // If network error or static host, keep existing user session
+          if (!localStorage.getItem('skillguard_user')) {
+            logout();
+          }
         })
         .finally(() => {
           setIsLoading(false);
